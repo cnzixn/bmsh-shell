@@ -1,0 +1,704 @@
+#!/data/data/com.termux/files/usr/bin/bash
+
+#$HOME为/data/data/com.termux/files/home
+#$PREFIX为/data/data/com.termux/files/usr
+#本地执行
+#bash self_file_path
+#远程执行
+#bash -c "$(wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-btb)"
+
+#GIT配置
+GID="LV9"
+git config --global user.name "$GID"
+git config --global user.email "zxchen1997@163.com"
+git config --global credential.helper store
+
+#定义全局变量：
+#执行本地脚本，则返回本地文件名
+#执行远程脚本，则返回bash
+SELF_ZERO="${0##*/}"
+#脚本名字
+SELF_NAME="BmToolBox"
+#脚本作者
+SELF_AUTHOR="樂卟嘶屬"
+#脚本标题
+SELF_TITLE=未知
+#脚本描述
+SELF_DESC="作者:@$SELF_AUTHOR QQ群:614255348\n\n  让你方便快捷地管理本地饥荒模组！"
+#脚本指令
+SELF_COMMAND="btb"
+#脚本版本
+SELF_VERSION="3.0"
+#脚本安装状态
+SELF_INSTALLED="未知"
+#脚本可安装/卸载
+SELF_OPERATION="未知"
+
+#脚本本地路径
+SELF_PATH="$(dirname $(readlink -f $0))/$SELF_ZERO"
+#脚本网络路径
+NET_PATH="https://gitee.com/$GID/bmsh-shell/raw/master/bmsh-btb"
+#临时脚本路径
+TEMP_PATH="$HOME/.bmsh_local_data_tempshell"
+#调试信息路径
+DEBUG_PATH="$HOME/.bmsh_local_data_debug"
+#上次时间路径
+LASTTIME_PATH="$HOME/.bmsh_local_data_lasttime"
+#已安装版本路径
+VERSION_PATH="$HOME/.bmsh_local_data_version"
+#已安装指令路径
+COMMAND_PATH="$HOME/.bmsh_local_data_command"
+#自定义包名
+APK_BOBB_PATH="$HOME/.bmsh_local_data_apk_bobb"
+#本地安装路径
+LOCAL_PATH=未知
+
+#本地上次使用时间
+LOCAL_LASTTIME=$(cat "$LASTTIME_PATH") >/dev/null 2>&1
+#本地安装版本
+LOCAL_VERSION=$(cat "$VERSION_PATH") >/dev/null 2>&1
+#本地安装指令
+LOCAL_COMMAND=$(cat "$COMMAND_PATH") >/dev/null 2>&1
+#自定义包名
+LOCAL_APK_BOBB=$(cat "$APK_BOBB_PATH") >/dev/null 2>&1
+
+#版本号
+APK_VERSION="50"
+#官方包名
+APK_OPKG="com.kleientertainment.doNotStarveShipwrecked"
+#官方数据包
+APK_OOBB="/sdcard/Android/obb/$APK_OPKG/main.$APK_VERSION.$APK_OPKG.obb"
+#包名
+APK_BPKG="bm.kleientertainment.doNotStarveShipwrecked"
+#数据包
+APK_BOBB="/sdcard/Android/obb/$APK_BPKG/main.$APK_VERSION.$APK_BPKG.obb"
+
+function main() {
+	#主函数
+	bmlogo
+	cd ~ >/dev/null
+	echo -e "  $SELF_TITLE\n"
+	echo -e "  $SELF_DESC\n"
+	echo -e "  [1] 数据导入    [2] 补丁安装\n"
+	echo -e "  [3] 模组安装    [4] 模组卸载\n"
+	echo -e "  [5] 数据移除    [6] 整合打包\n"
+	echo -e "  [7] 设置包名    [8] BTB $SELF_OPERATION\n"
+	echo -e "  [9] BTB 帮助    [0]     退出\n"
+	read -p '  请输入序号：' OPTION
+	####################################
+	if [ "${OPTION}" == '1' ]; then
+		obb_install
+	elif [ "${OPTION}" == '2' ]; then
+		patch_install
+	elif [ "${OPTION}" == '3' ]; then
+		mod_install
+	elif [ "${OPTION}" == '4' ]; then
+		mod_uninstall
+	elif [ "${OPTION}" == '5' ]; then
+		obb_remove
+	elif [ "${OPTION}" == '6' ]; then
+		package
+	elif [ "${OPTION}" == '7' ]; then
+		set_pkg
+	elif [ "${OPTION}" == '8' ]; then
+		if [ "${SELF_INSTALLED}" == '已安装' ]; then
+			update
+		else
+			install
+		fi
+	elif [ "${OPTION}" == '9' ]; then
+		help
+	elif [ "${OPTION}" == '0' ]; then
+		exit
+	else
+		#log "自身指令：$SELF_COMMAND 本地指令：[$LOCAL_COMMAND] 自身路径：$SELF_PATH 安装路径$LOCAL_PATH"
+		echo "  输入错误！"
+	fi
+	read -p "  请按任意键继续..." -n 1 press
+	main
+}
+
+#定义全局函数：
+function log() {
+	#记录调试信息到本地文件
+	#参数1：内容
+	#参数2：
+	#      00 覆盖写入，不输出内容
+	#      01 覆盖写入，输出内容
+	#      10 (默认)追加写入，不输出内容
+	#      11 追加写入，输出内容
+	currenttime="$(date '+%Y-%m-%d %H:%M:%S')"
+	currentstamp="$(date +%s -d "$currenttime")"
+	mode="$2"
+	mode=${mode:-"10"}
+	if [ $mode -lt 10 ]; then
+		echo "时间$currentstamp $currenttime ${1:-内容为空}" >"$DEBUG_PATH"
+	else
+		echo "$currentstamp $currenttime ${1:-内容为空}" >>"$DEBUG_PATH"
+	fi
+	if [ $(expr "$mode" % 2) -eq 1 ]; then
+		echo "$currentstamp $currenttime ${1:-内容为空}"
+	fi
+}
+
+function bmsh_termux_init() {
+	#检测存储权限，没有则申请
+	while [ ! "$termux_need_setup_storage" ]; do
+		ls /sdcard >/dev/null 2>&1
+		if [ "$?" -ne 0 ]; then
+			read -p "  授予Termux存储权限并继续？ [Y/n] " input
+			case $input in
+			#[yY][eE][sS] | [yY])
+			#	;;
+			[nN][oO] | [nN])
+				ls /sdcard >/dev/null 2>&1
+				if [ "$?" -ne 0 ]; then
+					exit
+				fi
+				;;
+			*)
+				termux-setup-storage
+				sleep 3
+				;;
+			esac
+		else
+			termux_need_setup_storage="true"
+		fi
+	done
+	which git wget 7za >/dev/null 2>&1
+	if [ "$?" -eq 1 ]; then
+		printf "\r  下载依赖包......"
+		pkg install git wget p7zip -y >/dev/null 2>&1
+		printf "\r  下载依赖包完成！\n"
+	fi
+}
+
+function install() {
+	bmlogo
+	if [ "$SELF_PATH" == "$TEMP_PATH" -o "$difftime" -gt 100000000 ]; then
+		echo "  欢迎使用$SELF_NAME，下面进入安装引导："
+	fi
+	while true; do
+		read -p "  你想要安装[$LOCAL_COMMAND]指令吗？ [Y/n] " input
+		case $input in
+		#[yY][eE][sS] | [yY])
+		#	;;
+		[nN][oO] | [nN])
+			break
+			;;
+		*)
+			read -p "  将[$LOCAL_COMMAND]重命名？ 默认[$LOCAL_COMMAND]：" rename
+			if [ "$rename" ]; then
+				LOCAL_COMMAND="$rename"
+			fi
+			wget -qO "$TEMP_PATH" "$NET_PATH"
+			cp -r $TEMP_PATH $PREFIX/bin/$LOCAL_COMMAND
+			chmod +x "$PREFIX/bin/$LOCAL_COMMAND"
+			echo "$SELF_VERSION" >"$VERSION_PATH"
+			echo "$LOCAL_COMMAND" >"$COMMAND_PATH"
+			echo "$LOCAL_COMMAND" >"$HOME/.bashrc"
+			echo "  安装完成，输入[$LOCAL_COMMAND]使用本工具"
+			read -p "  请按任意键继续..." -n 1 press
+			$LOCAL_COMMAND
+			exit
+			;;
+		esac
+	done
+}
+
+function update() {
+	bmlogo
+	if [ $SELF_INSTALLED == "已安装" ]; then
+		echo "  $SELF_NAME($SELF_VERSION) 指令[${LOCAL_COMMAND}] 正在更新..."
+		wget -qO "$TEMP_PATH" "$NET_PATH"
+		cp -r $TEMP_PATH $PREFIX/bin/$LOCAL_COMMAND
+		chmod +x "$PREFIX/bin/$LOCAL_COMMAND"
+		echo "$SELF_VERSION" >"$VERSION_PATH"
+		echo "  $SELF_NAME($SELF_VERSION) 指令[${LOCAL_COMMAND}] 更新完成!!!"
+		read -p "  请按任意键继续..." -n 1 press
+		$LOCAL_COMMAND
+		exit
+	else
+		read -p "  你未安装$SELF_NAME..." -n 1 press
+		main
+	fi
+}
+
+function uninstall() {
+	bmlogo
+	if [ $SELF_INSTALLED == "已安装" ]; then
+		while true; do
+			read -p "  你想要卸载[$LOCAL_COMMAND]指令吗？ [Y/n] " input
+			case $input in
+			#[yY][eE][sS] | [yY])
+			#	;;
+			[nN][oO] | [nN])
+				break
+				;;
+			*)
+				rm -f $LOCAL_PATH
+				echo "" >"$VERSION_PATH"
+				echo "" >"$COMMAND_PATH"
+				read -p "  [$LOCAL_COMMAND]卸载完成，再见..." -n 1 press
+				exit
+				;;
+			esac
+		done
+	else
+		read -p "  你未安装$SELF_NAME..." -n 1 press
+
+	fi
+}
+
+function help() {
+	bmlogo
+	echo
+	echo "  $SELF_TITLE"
+	echo
+	echo -e "  $SELF_DESC"
+	echo
+	echo "  使用"
+	echo "    $LOCAL_COMMAND [参数]"
+	echo "    例1: 输入 $LOCAL_COMMAND 进入$SELF_NAME主程序"
+	echo "    例2: 输入 $LOCAL_COMMAND -h 查看此帮助文档"
+	echo
+	echo "  参数"
+	echo "    空        启动$SELF_NAME"
+	echo "    -i        安装$SELF_NAME"
+	echo "    -r        卸载$SELF_NAME"
+	echo "    -u        更新$SELF_NAME"
+	echo "    -h        $SELF_NAME帮助"
+	echo
+	echo -e "  BMSH：https://gitee.com/$GID"
+	echo
+	echo -e "  Copyright (C) 2020 @$SELF_AUTHOR."
+	echo
+	while true; do
+		read -p "  你想要请作者喝茶么？ [y/N] " input
+		case $input in
+		[yY][eE][sS] | [yY])
+			am start -a android.intent.action.VIEW -d 'alipayqr://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx04773umy76vnxtyn2x5a' >/dev/null 2>&1
+			echo "  你同意了请作者喝茶......"
+			break
+			;;
+		#[nN][oO] | [nN])
+		#	break
+		#	;;
+		*)
+			echo "  你拒绝了请作者喝茶......"
+			break
+			;;
+		esac
+	done
+	echo
+}
+
+function bmlogo() {
+	#____  __  __ __  __  ___  ____  ____
+	#| __ )|  \/  |  \/  |/ _ \|  _ \/ ___|
+	#|  _ \| |\/| | |\/| | | | | | | \___ \
+	#| |_) | |  | | |  | | |_| | |_| |___) |
+	#|____/|_|  |_|_|  |_|\___/|____/|____/
+	clear
+	echo -e "   ____  __  __ __  __  ___  ____  ____"
+	echo -e "  | __ )|  \\/  |  \\/  |/ _ \\|  _ \\/ ___|"
+	echo -e "  |  _ \\| |\\/| | |\\/| | | | | | | \\___ \\"
+	echo -e "  | |_) | |  | | |  | | |_| | |_| |___) |"
+	echo -e "  |____/|_|  |_|_|  |_|\\___/|____/|____/"
+	echo -e ""
+}
+
+#返回0，则官方数据包存在
+function oobb_exist() {
+	if [ ! -f "$APK_OOBB" ]; then
+		return 1
+	fi
+	m1=$(ls -l "$APK_OOBB" | awk '{print $5}')
+	#echo modindex:$m1
+	#echo mods:$m2
+	#判断是否为官方特征码
+	if [ "$m1" -eq "521631690" ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+function mod_list() {
+	if [ -f "$APK_BOBB" ]; then
+		str=$(7za l "$APK_BOBB" "mods/BM????/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
+		str=${str:-"无模组"}
+		chars=$(echo $str | wc -c)
+		lines=$(expr $chars / 35)
+		i=0
+		while test $i -le $lines; do
+			nstart=$(expr 35 \* $i + 1)
+			nend=$(expr 35 \* $i + 35)
+			text=$(echo $str | cut -c $nstart-$nend)
+			if test -n "$text"; then
+				echo "  $text"
+			fi
+			i=$(expr $i + 1)
+		done
+	else
+		echo "  无模组"
+	fi
+}
+
+function obb_install() {
+	oobb_exist
+	if [ ! "$?" == 0 ]; then
+		echo "  官方数据包不存在！"
+		return 0
+	fi
+	if [ -f "$APK_BOBB" ]; then
+		read -p "  你想要覆盖当前数据包？ [y/N] " input
+		case $input in
+		[yY][eE][sS] | [yY])
+			log "继续导入"
+			;;
+		#[nN][oO] | [nN])
+		#	;;
+		*)
+			echo "  取消导入数据包！"
+			return 0
+			;;
+		esac
+	fi
+	#判断路径是否存在
+	if [ ! -d $(dirname "$APK_BOBB") ]; then
+		#创建路径
+		mkdir -p $(dirname "$APK_BOBB")
+	fi
+	printf "  导入数据包......\r"
+	cp -r "$APK_OOBB" "$APK_BOBB" >/dev/null 2>&1
+	if [ "$?" -eq 0 ]; then
+		printf "  导入数据包成功！\n"
+	else
+		printf "  导入数据包失败！\n"
+	fi
+}
+
+function patch_install() {
+	#临时路径
+	cd /sdcard
+	rm -rf bm_mods_install
+	mkdir -p bm_mods_install
+	cd bm_mods_install
+	read -p "  请输入补丁ID(200120)：" PID
+	if [ -z $PID ]; then
+		return 0
+	fi
+	#判断路径是否存在
+	if [ ! -d $(dirname "$APK_BOBB") ]; then
+		#创建路径
+		mkdir -p $(dirname "$APK_BOBB")
+	fi
+	#  #  #  #  #  #  #  #  #  #
+	#git仓库名称
+	GNAME="bmsh-patch"
+	#根据补丁ID计算git分支名称
+	BNAME="BM$PID"
+	#  #  #  #  #  #  #  #  #  #
+	#删除仓库路径
+	rm -rf $GNAME
+	#下载远程仓库
+	printf "  下载$BNAME......\r"
+	git clone -b "$BNAME" --single-branch "https://gitee.com/$GID/$GNAME.git" >/dev/null 2>&1
+	if [ "$?" -eq 0 ]; then
+		printf "  下载$BNAME成功！\n"
+	else
+		printf "  下载$BNAME失败！\n"
+	fi
+	#进入补丁路径
+	if [ -d "$GNAME/$BNAME" ]; then
+		cd $GNAME/$BNAME
+		list=""
+		for FILE in ./*; do
+			if test -d $FILE; then
+				DIR=$(basename $FILE)
+				list="$list $DIR"
+			fi
+		done
+		printf "  复制$list......\r"
+		7za a -tzip "$APK_BOBB" $list >/dev/null 2>&1
+		if [ "$?" -eq 0 ]; then
+			printf "  复制$list成功！\n"
+		else
+			printf "  复制$list失败！\n"
+		fi
+
+	fi
+
+	echo "  ----------------"
+}
+
+function mod_install() {
+	#临时路径
+	cd /sdcard
+	rm -rf bm_mods_install
+	mkdir -p bm_mods_install
+	cd bm_mods_install
+	echo "  本地模组列表："
+	mod_list
+	read -p "  请输入模组ID(1-350)：" LIST
+	for MID in $LIST; do
+		#  #  #  #  #  #  #  #  #  #
+		#模组ID去除非数字字符
+		MID=$(echo $MID | tr -cd "[a-zA-Z0-9/]")
+		#模组ID转为数字
+		MID=$(expr $MID + 0)
+		#模组ID转为4位的数字字符串
+		MID=$(printf "%04d" $MID)
+		#根据模组ID计算git仓库名称
+		GNAME=`echo $MID | awk '{printf("bmsh-mods%1d",($1-1)/50%10)}'`
+		#根据模组ID计算git分支名称
+		BNAME="BM$MID"
+		#获取本地模组文件名(带后缀)
+		FNAME=$(basename $(find "$FROM" -name $MID*.ZIP) .ZIP)
+		#  #  #  #  #  #  #  #  #  #
+		#删除旧文件
+		if [ -f "$APK_BOBB" ]; then
+			old=$(7za l "$APK_BOBB" "mods/$BNAME/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
+		fi
+		if [ $old ]; then
+			printf "  删除$BNAME......\r"
+			7za d -tzip -r "$APK_BOBB" "mods/$BNAME/" >/dev/null 2>&1
+			if [ "$?" -eq 0 ]; then
+				printf "  删除$BNAME成功！\r"
+			else
+				printf "  删除$BNAME失败！\r"
+			fi
+		fi
+		#下载并安装
+		printf "  下载$BNAME......\r"
+		git clone -b "$BNAME" --single-branch "https://gitee.com/$GID/$GNAME.git" >/dev/null 2>&1
+		if [ "$?" -eq 0 ]; then
+			printf "  下载$BNAME成功！\r"
+		else
+			printf "  下载$BNAME失败！\r"
+		fi
+		if [ -d "$GNAME" ]; then
+			rm -rf $GNAME/.git
+			mv $GNAME mods
+			printf "  安装$BNAME......\r"
+			7za a -tzip "$APK_BOBB" mods >/dev/null 2>&1
+			if [ "$?" -eq 0 ]; then
+				printf "  安装$BNAME成功！\n"
+			else
+				printf "  安装$BNAME失败！\n"
+			fi
+			echo "  ----------------"
+			rm -rf mods
+		else
+			printf "  安装$BNAME失败！\n"
+		fi
+
+	done
+	echo "  本地模组列表："
+	mod_list
+}
+
+function mod_uninstall() {
+	echo "  本地模组列表："
+	mod_list
+	read -p "  请输入模组ID(1-350)：" LIST
+	for MID in $LIST; do
+		#  #  #  #  #  #  #  #  #  #
+		#模组ID去除非数字字符
+		MID=$(echo $MID | tr -cd "[0-9]")
+		#模组ID转为数字
+		MID=$(expr $MID + 0)
+		#模组ID转为4位的数字字符串
+		MID=$(printf "%04d" $MID)
+		#根据模组ID计算git仓库名称
+		GNAME=`echo $MID | awk '{printf("bmsh-mods%1d",($1-1)/50%10)}'`
+		#根据模组ID计算git分支名称
+		BNAME="BM$MID"
+		#获取本地模组文件名(带后缀)
+		FNAME=$(basename $(find "$FROM" -name $MID*.ZIP) .ZIP)
+		#  #  #  #  #  #  #  #  #  #
+		#删除模组
+		if [ -f "$APK_BOBB" ]; then
+			old=$(7za l "$APK_BOBB" "mods/$BNAME/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
+		fi
+		if [ $old ]; then
+			printf "  删除$BNAME......\r"
+			7za d -tzip -r "$APK_BOBB" "mods/$BNAME/" >/dev/null 2>&1
+			if [ "$?" -eq 0 ]; then
+				printf "  删除$BNAME成功！\n"
+			else
+				printf "  删除$BNAME失败！\n"
+			fi
+		else
+			printf "  没有找到$BNAME！\n"
+		fi
+		echo "  ----------------"
+	done
+	echo "  本地模组列表："
+	mod_list
+}
+
+function obb_remove() {
+	read -p "  你想要移除摇摇船数据包吗？ [y/N] " input
+	case $input in
+	[yY][eE][sS] | [yY])
+		rm -rf $APK_BOBB
+		echo "  成功移除$APK_BOBB"
+		;;
+	#[nN][oO] | [nN])
+	#	break
+	#	;;
+	*)
+		echo "  你取消了移除摇摇船数据包操作"
+		;;
+	esac
+
+}
+
+function set_pkg() {
+read -p "  你重新打包后想要设置包名？ 默认[$APK_BPKG]：" rename
+	if [ "$rename" ]; then
+		
+		echo "  原包名：$APK_BPKG"
+		#包名
+		APK_BPKG="$rename"
+		#数据包
+		APK_BOBB="/sdcard/Android/obb/$APK_BPKG/main.$APK_VERSION.$APK_BPKG.obb"
+		echo "  现包名：$APK_BPKG"
+		echo "$APK_BPKG" >"$APK_BOBB_PATH"
+	fi
+}
+
+function package() {
+
+	cd /sdcard
+
+	rm 摇摇船*.APK >/dev/null 2>&1
+	
+	key="/sdcard/MT2/keys/bmsh-btb.key"
+	
+	if [ ! -d $(dirname "$key") ]; then
+		#创建路径
+		mkdir -p $(dirname "$key")
+	fi
+	
+	wget -qO "$key" https://bunnyman.gitee.io/bmsh-btb.key
+	if [ -f "$key" ]; then
+		printf "  下载签名密钥成功！\n"
+	else
+		printf "  下载签名密钥失败！\n"
+		return 2
+	fi
+
+	wget -qO /sdcard/摇摇船.APK https://bunnyman.gitee.io/bm_127.apk
+	if [ -f "/sdcard/摇摇船.APK" ]; then
+		printf "  下载摇摇船成功！\n"
+	else
+		printf "  下载摇摇船失败！\n"
+		return 3
+	fi
+
+	#临时路径
+	rm -rf bm_mods_install
+	mkdir -p bm_mods_install
+	cd bm_mods_install
+
+	#解压数据包
+	printf "  解压数据包......\r"
+	7z x -tzip "$APK_BOBB" -oassets >/dev/null 2>&1
+	printf "  解压数据包完成！\n"
+	printf "  生成安装包......\r"
+	7z a -tzip "/sdcard/摇摇船.APK" "assets" >/dev/null 2>&1
+	printf "  生成安装包完成！\n"
+	rm -rf assets
+
+	echo "  请签名后安装“/sdcard/摇摇船.APK”！"
+
+}
+
+#脚本开始
+
+#初始化脚本运行环境
+bmsh_termux_init
+
+#记录当前时间
+echo $(date '+%Y-%m-%d %H:%M:%S') >"$LASTTIME_PATH"
+
+#初始化变量值
+
+#本地上次使用时间
+LOCAL_LASTTIME=${LOCAL_LASTTIME:-"2009-09-09 09:09:09"}
+#本地安装版本
+LOCAL_VERSION=${LOCAL_VERSION:-$SELF_VERSION}
+#本地安装指令
+LOCAL_COMMAND=${LOCAL_COMMAND:-$SELF_COMMAND}
+LOCAL_APK_BOBB=${LOCAL_APK_BOBB:-$APK_BPKG}
+#包名
+APK_BPKG="$LOCAL_APK_BOBB"
+#数据包
+APK_BOBB="/sdcard/Android/obb/$APK_BPKG/main.$APK_VERSION.$APK_BPKG.obb"
+
+#检测是否安装
+if [ -e "$PREFIX/bin/$LOCAL_COMMAND" ]; then
+	SELF_INSTALLED=已安装
+	SELF_OPERATION=更新
+	LOCAL_PATH="$PREFIX/bin/$LOCAL_COMMAND"
+else
+	SELF_INSTALLED=未安装
+	SELF_OPERATION=安装
+	LOCAL_COMMAND=$SELF_COMMAND
+fi
+#设置标题
+SELF_TITLE="$SELF_NAME($SELF_VERSION) $SELF_INSTALLED 命令[$LOCAL_COMMAND]"
+
+#计算上次执行时间差
+currenttime="$(date +%s -d "$(date '+%Y-%m-%d %H:%M:%S')")"
+lasttime=$(date +%s -d "$LOCAL_LASTTIME")
+difftime=$(expr $currenttime - $lasttime)
+log "当前：$currenttime 上次$lasttime 差值$difftime"
+
+#当前执行远程脚本，下载为临时脚本并执行
+if [ "$SELF_ZERO" == "bash" ]; then
+	wget -qO "$TEMP_PATH" "$NET_PATH"
+	bash "$TEMP_PATH"
+	exit 0
+fi
+
+#未安装则安装，已安装则更新
+if [ "$SELF_INSTALLED" == "已安装" ]; then
+	if [ "$SELF_PATH" == "$TEMP_PATH" -o "$difftime" -gt 300 ]; then
+		update
+	fi
+else
+	#if [ "$SELF_PATH" == "$TEMP_PATH" -o "$difftime" -gt 100000000 ]; then
+	#log "欢迎新宝宝使用$SELF_NAME，下面进入安装引导："
+	install
+	#fi
+fi
+
+#开始执行脚本
+if [ $# == 0 ]; then
+	main
+elif [ $1 == -i ]; then
+	install
+elif [ $1 == -r ]; then
+	uninstall
+elif [ $1 == -u ]; then
+	update
+elif [ $1 == -h ]; then
+	help
+elif [ $1 == --m ]; then
+	#自用工具
+	bash /sdcard/git/bunnyman/bmsh-shell/git_mup.sh
+elif [ $1 == --p ]; then
+	#自用工具
+	bash /sdcard/git/bunnyman/bmsh-shell/git_pup.sh
+elif [ $1 == --d ]; then
+	#自用工具
+	bash /sdcard/git/bunnyman/bmsh-shell/bmsh-wsd
+else
+	help
+fi
+
+#脚本结束
