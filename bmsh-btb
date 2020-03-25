@@ -28,7 +28,7 @@ SELF_DESC="作者:@$SELF_AUTHOR QQ群:614255348\n\n  让你方便快捷地管理
 #脚本指令
 SELF_COMMAND="btb"
 #脚本版本
-SELF_VERSION="3.0"
+SELF_VERSION="LV9"
 #脚本安装状态
 SELF_INSTALLED="未知"
 #脚本可安装/卸载
