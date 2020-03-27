@@ -543,8 +543,8 @@ function obb_remove() {
 	read -p "  你想要移除摇摇船数据包吗？ [y/N] " input
 	case $input in
 	[yY][eE][sS] | [yY])
-		rm -rf $APK_BOBB
-		echo "  成功移除$APK_BOBB"
+		rm -rf  $(dirname "$APK_BOBB")
+		echo "  成功移除 $(basenam "$APK_BOBB")"
 		;;
 	#[nN][oO] | [nN])
 	#	break
