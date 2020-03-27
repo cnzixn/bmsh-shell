@@ -595,7 +595,7 @@ function package() {
 		return 2
 	fi
 
-	wget -qO /sdcard/摇摇船.APK https://bunnyman.gitee.io/bm_127.apk
+	wget -qO /sdcard/摇摇船.APK https://bunnyman.gitee.io/bm_1.27.apk
 	if [ -f "/sdcard/摇摇船.APK" ]; then
 		printf "  下载摇摇船成功！\n"
 	else
