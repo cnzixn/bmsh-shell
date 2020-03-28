@@ -73,6 +73,9 @@ APK_BPKG="bm.kleientertainment.doNotStarveShipwrecked"
 #数据包
 APK_BOBB="/sdcard/Android/obb/$APK_BPKG/main.$APK_VERSION.$APK_BPKG.obb"
 
+#自定义包名
+BMUID=$(cat "/sdcard/bm_uid.txt") >/dev/null 2>&1
+
 function main() {
 	#主函数
 	bmlogo
@@ -84,6 +87,7 @@ function main() {
 	echo -e "  [5] 数据移除    [6] 整合打包\n"
 	echo -e "  [7] 设置包名    [8] BTB $SELF_OPERATION\n"
 	echo -e "  [9] BTB 帮助    [0]     退出\n"
+	echo -e "  BMUID $BMUID\n"
 	read -p '  请输入序号：' OPTION
 	####################################
 	if [ "${OPTION}" == '1' ]; then
@@ -642,6 +646,9 @@ LOCAL_APK_BOBB=${LOCAL_APK_BOBB:-$APK_BPKG}
 APK_BPKG="$LOCAL_APK_BOBB"
 #数据包
 APK_BOBB="/sdcard/Android/obb/$APK_BPKG/main.$APK_VERSION.$APK_BPKG.obb"
+#BMUID
+BMUID=${BMUID:-********}
+BMUID=$(echo $BMUID | sed 's/BMUID//g' | sed 's/ //g' )
 
 #检测是否安装
 if [ -e "$PREFIX/bin/$LOCAL_COMMAND" ]; then
