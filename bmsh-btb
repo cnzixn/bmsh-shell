@@ -87,8 +87,8 @@ function main() {
 	echo -e "  [5] 数据移除    [6] 整合打包\n"
 	echo -e "  [7] 设置包名    [8] BTB $SELF_OPERATION\n"
 	echo -e "  [9] BTB 帮助    [0]     退出\n"
-	echo -e "  BMUID $BMUID\n"
-	read -p '  请输入序号：' OPTION
+	read -n1 -p "  BMUID $BMUID 请输入序号：" OPTION
+	echo
 	####################################
 	if [ "${OPTION}" == '1' ]; then
 		obb_install
