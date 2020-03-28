@@ -24,7 +24,7 @@ SELF_AUTHOR="樂卟嘶屬"
 #脚本标题
 SELF_TITLE=未知
 #脚本描述
-SELF_DESC="作者:@$SELF_AUTHOR QQ群:614255348\n\n  让你方便快捷地管理本地饥荒模组！"
+SELF_DESC="未知"
 #脚本指令
 SELF_COMMAND="btb"
 #脚本版本
@@ -81,7 +81,6 @@ function main() {
 	bmlogo
 	cd ~ >/dev/null
 	echo -e "  $SELF_TITLE\n"
-	echo -e "  $SELF_DESC\n"
 	echo -e "  [1] 数据导入    [2] 补丁安装\n"
 	echo -e "  [3] 模组安装    [4] 模组卸载\n"
 	echo -e "  [5] 数据移除    [6] 整合打包\n"
@@ -263,8 +262,8 @@ function help() {
 	echo
 	echo "  使用"
 	echo "    $LOCAL_COMMAND [参数]"
-	echo "    例1: 输入 $LOCAL_COMMAND 进入$SELF_NAME主程序"
-	echo "    例2: 输入 $LOCAL_COMMAND -h 查看此帮助文档"
+	echo "    例1: 输入 $LOCAL_COMMAND 进入BTB主界面"
+	echo "    例2: 输入 $LOCAL_COMMAND -h 查看此文档"
 	echo
 	echo "  参数"
 	echo "    空        启动$SELF_NAME"
@@ -275,7 +274,7 @@ function help() {
 	echo
 	echo -e "  BMSH：https://gitee.com/$GID"
 	echo
-	echo -e "  Copyright (C) 2020 @$SELF_AUTHOR."
+	echo -e "  Copyright (C) 2020 @$SELF_AUTHOR"
 	echo
 	while true; do
 		read -p "  你想要请作者喝茶么？ [y/N] " input
@@ -298,17 +297,12 @@ function help() {
 }
 
 function bmlogo() {
-	#____  __  __ __  __  ___  ____  ____
-	#| __ )|  \/  |  \/  |/ _ \|  _ \/ ___|
-	#|  _ \| |\/| | |\/| | | | | | | \___ \
-	#| |_) | |  | | |  | | |_| | |_| |___) |
-	#|____/|_|  |_|_|  |_|\___/|____/|____/
 	clear
-	echo -e "   ____  __  __ __  __  ___  ____  ____"
-	echo -e "  | __ )|  \\/  |  \\/  |/ _ \\|  _ \\/ ___|"
-	echo -e "  |  _ \\| |\\/| | |\\/| | | | | | | \\___ \\"
-	echo -e "  | |_) | |  | | |  | | |_| | |_| |___) |"
-	echo -e "  |____/|_|  |_|_|  |_|\\___/|____/|____/"
+	echo -e "   ____  __  __   ____  _   _"
+	echo -e "  | __ )|  \\/  | / ___|| | | |"
+	echo -e "  |  _ \\| |\\/| | \\___ \\| |_| |"
+	echo -e "  | |_) | |  | |  ___) |  _  |"
+	echo -e "  |____/|_|  |_| |____/|_| |_|"
 	echo -e ""
 }
 
@@ -661,7 +655,8 @@ else
 	LOCAL_COMMAND=$SELF_COMMAND
 fi
 #设置标题
-SELF_TITLE="$SELF_NAME($SELF_VERSION) $SELF_INSTALLED 命令[$LOCAL_COMMAND]"
+SELF_TITLE="作者:$SELF_AUTHOR  Q群:614255348"
+SELF_DESC="$SELF_NAME($SELF_VERSION) $SELF_INSTALLED命令$LOCAL_COMMAND "
 
 #计算上次执行时间差
 currenttime="$(date +%s -d "$(date '+%Y-%m-%d %H:%M:%S')")"
