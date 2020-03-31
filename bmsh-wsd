@@ -12,8 +12,8 @@ steam_id=`echo $INPUT | sed 's/http.*id=\([0-9]*\)&.*/\1/'`
 json=`wget -qO- "https://5.5w.pw/api?mid=$steam_id"`
 title=`echo $json | sed 's/.*"title":"\([^,}]*\)".*/\1/'`
 url=`echo $json | sed 's/.*"url":"\([^,}]*\)".*/\1/'`
-url=`echo $json | sed 's/.*"code":"\([^,}]*\)".*/\1/'`
-if [ $url -a ! $code==404 ] ; then
+url=`echo $json | sed 's/.*"code":\([^,}]*\).*/\1/'`
+if [ ! $code==404 ] ; then
 printf "开始下载……\n"
 printf "title：$title\n"
 printf "url：$url\n"
