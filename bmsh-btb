@@ -641,7 +641,7 @@ APK_BPKG="$LOCAL_APK_BOBB"
 #数据包
 APK_BOBB="/sdcard/Android/obb/$APK_BPKG/main.$APK_VERSION.$APK_BPKG.obb"
 #BMUID
-BMUID=${BMUID:-********}
+BMUID=${BMUID:-000000}
 BMUID=$(echo $BMUID | sed 's/BMUID//g' | sed 's/ //g' )
 
 #检测是否安装
