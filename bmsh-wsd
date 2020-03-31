@@ -1,6 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/bash
 #WorkShopDownloader #创意工坊下载器
 clear
+echo "作者：樂卟嘶屬 Q群：614255348"
 read -p "请输入STEAM模组ID或URL：" INPUT
 if [ ! $INPUT ] ; then
 echo "啥也没发生！"
