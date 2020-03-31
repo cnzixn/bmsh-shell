@@ -28,7 +28,7 @@ SELF_DESC="未知"
 #脚本指令
 SELF_COMMAND="btb"
 #脚本版本
-SELF_VERSION="4.2"
+SELF_VERSION="4.3"
 #脚本安装状态
 SELF_INSTALLED="未知"
 #脚本可安装/卸载
@@ -673,7 +673,7 @@ fi
 
 #未安装则安装，已安装则更新
 if [ "$SELF_INSTALLED" == "已安装" ]; then
-	if [ "$SELF_PATH" == "$TEMP_PATH" -o "$difftime" -gt 300 ]; then
+	if [ "$SELF_PATH" == "$TEMP_PATH" -o "$difftime" -gt 18000 ]; then
 		update
 	fi
 else
