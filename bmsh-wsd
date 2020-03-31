@@ -2,7 +2,7 @@
 #WorkShopDownloader #创意工坊下载器
 clear
 echo "作者：樂卟嘶屬 Q群：614255348"
-read -p "请输入STEAM模组ID或URL：" INPUT
+read -p "请输入创意工坊模组ID或URL：\n" INPUT
 if [ ! $INPUT ] ; then
 echo "啥也没发生！"
 exit
@@ -14,5 +14,9 @@ url=`echo $json | sed 's/.*"url":"\([^,}]*\)".*/\1/'`
 printf "正在下载……\n"
 printf "title：$title\n"
 printf "url：$url\n"
+if [ $url ] ;
 wget -qO "/sdcard/download/[M]$title.ZIP" "$url"
-printf "下载完成，已保存文件/sdcard/download/[WSD]$title.ZIP\n"
+printf "下载完成，已保存文件/sdcard/download/[WSD]$title.ZIP"
+else
+printf "下载失败！请输入正确的ID或URL！"
+fi
