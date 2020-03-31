@@ -13,10 +13,10 @@ json=`wget -qO- "https://5.5w.pw/api?mid=$steam_id"`
 title=`echo $json | sed 's/.*"title":"\([^,}]*\)".*/\1/'`
 url=`echo $json | sed 's/.*"url":"\([^,}]*\)".*/\1/'`
 url=`echo $json | sed 's/.*"code":"\([^,}]*\)".*/\1/'`
-printf "正在下载……\n"
+if [ $url -a ! $code==404 ] ; then
+printf "开始下载……\n"
 printf "title：$title\n"
 printf "url：$url\n"
-if [ $url -a ! $code==404 ] ; then
 wget -qO "/sdcard/download/[M]$title.ZIP" "$url"
 printf "下载完成，已保存文件/sdcard/download/[WSD]$title.ZIP"
 else
