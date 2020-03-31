@@ -2,7 +2,8 @@
 #WorkShopDownloader #创意工坊下载器
 clear
 echo "作者：樂卟嘶屬 Q群：614255348"
-read -p "请输入创意工坊模组ID或URL：\n" INPUT
+echo "请输入创意工坊模组ID或URL："
+read INPUT
 if [ ! $INPUT ] ; then
 echo "啥也没发生！"
 exit
