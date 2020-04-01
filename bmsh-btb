@@ -332,10 +332,10 @@ for obb in $(find "/sdcard/" -name "*main.50.com.kleientertainment.doNotStarveSh
 		#echo "原版数据包："$APK_OOBB
 		return 0
 	fi
-	APK_OOBB=$temp
+done
+APK_OOBB=$temp
 	#echo "原版数据包未找到！"
 	return 1
-done
 }
 
 function mod_list() {
@@ -403,7 +403,7 @@ function patch_install() {
 	rm -rf bm_mods_install
 	mkdir -p bm_mods_install
 	cd bm_mods_install
-	read -p "请输入补丁ID(200120)：" PID
+	read -p "请输入补丁ID(200401)：" PID
 	if [ -z $PID ]; then
 		return 0
 	fi
