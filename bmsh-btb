@@ -365,11 +365,12 @@ function obb_install() {
 	if [ "$?" == 0 ]; then
 	echo "原版数据包："$APK_OOBB
 	else
-		echo "原版数据包未找到！"
+		echo "原版数据包：未找到！"
 		return 0
 	fi
+	echo "当前数据包：$APK_BOBB"
 	if [ -f "$APK_BOBB" ]; then
-		read -p "你想要覆盖已有数据包？[y/N]" input
+		read -p "你想要覆盖当前数据包？[y/N]" input
 		case $input in
 		[yY][eE][sS] | [yY])
 			log "继续导入"
