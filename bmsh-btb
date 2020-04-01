@@ -169,7 +169,9 @@ function bmsh_termux_init() {
 		fi
 	done
 	which git wget 7za >/dev/null 2>&1
-	if [ "$?" -eq 1 ]; then
+	if [ "$?" == 1 ]; then
+		sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux stable main@' $PREFIX/etc/apt/sources.list
+		apt update && apt upgrade -y
 		printf "\r  下载依赖包......"
 		pkg install git wget p7zip -y >/dev/null 2>&1
 		printf "\r  下载依赖包完成！\n"
