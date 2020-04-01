@@ -363,9 +363,9 @@ function obb_install() {
 	printf "原版数据包查找中……"
 	oobb_find
 	if [ "$?" == 0 ]; then
-	printf "\r原版数据包："$APK_OOBB
+	printf "\r原版数据包：$APK_OOBB\n"
 	else
-		printf "\r原版数据包：未找到！"
+		printf "\r原版数据包：未找到！\n"
 		return 0
 	fi
 	echo "当前数据包：$APK_BOBB"
