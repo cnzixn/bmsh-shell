@@ -324,7 +324,6 @@ function oobb_exist() {
 
 #查找原版数据包
 function oobb_find(){
-echo "原版数据包查找中……"
 temp=$APK_OOBB
 for obb in $(find "/sdcard/" -name "*main.50.com.kleientertainment.doNotStarveShipwrecked.obb") ; do
   APK_OOBB=$obb
@@ -361,11 +360,12 @@ function mod_list() {
 }
 
 function obb_install() {
+	printf "原版数据包查找中……"
 	oobb_find
 	if [ "$?" == 0 ]; then
-	echo "原版数据包："$APK_OOBB
+	echo "\r原版数据包："$APK_OOBB
 	else
-		echo "原版数据包：未找到！"
+		echo "\r原版数据包：未找到！"
 		return 0
 	fi
 	echo "当前数据包：$APK_BOBB"
