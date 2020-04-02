@@ -20,5 +20,5 @@ printf "url：$url\n"
 wget -qO "/sdcard/download/[M]$title.ZIP" "$url"
 printf "下载完成，已保存文件/sdcard/download/[WSD]$title.ZIP\n"
 else
-printf "下载失败！输入的ID或URL有误！\n"
+printf "下载失败！ID[$steam_id]有误！\n"
 fi
