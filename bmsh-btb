@@ -607,7 +607,7 @@ function package() {
 		mkdir -p $(dirname "$key")
 	fi
 	
-	wget -qO "$key" https://bunnyman.gitee.io/bmsh-btb.key
+	wget -qO "$key" https://lv9.gitee.io/bmsh-btb.key
 	if [ -f "$key" ]; then
 		printf "下载签名密钥成功！\n"
 	else
@@ -615,7 +615,7 @@ function package() {
 		return 2
 	fi
 
-	wget -qO /sdcard/摇摇船.APK https://bunnyman.gitee.io/bm_1.27.apk
+	wget -qO /sdcard/摇摇船.APK https://lv9.gitee.io/bm_1.27.apk
 	if [ -f "/sdcard/摇摇船.APK" ]; then
 		printf "下载摇摇船成功！\n"
 	else
@@ -716,15 +716,6 @@ elif [ $1 == -u ]; then
 	update
 elif [ $1 == -h ]; then
 	help
-elif [ $1 == --m ]; then
-	#自用工具
-	bash /sdcard/git/bunnyman/bmsh-shell/git_mup.sh
-elif [ $1 == --p ]; then
-	#自用工具
-	bash /sdcard/git/bunnyman/bmsh-shell/git_pup.sh
-elif [ $1 == --d ]; then
-	#自用工具
-	bash /sdcard/git/bunnyman/bmsh-shell/bmsh-wsd
 else
 	help
 fi
