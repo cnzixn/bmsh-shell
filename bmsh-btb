@@ -28,7 +28,7 @@ SELF_DESC="未知"
 #脚本指令
 SELF_COMMAND="btb"
 #脚本版本
-SELF_VERSION="4.6"
+SELF_VERSION="4.7"
 #脚本安装状态
 SELF_INSTALLED="未知"
 #脚本可安装/卸载
@@ -85,7 +85,7 @@ function main() {
 	echo -e "[3] 模组安装    [4] 模组卸载\n"
 	echo -e "[5] 数据移除    [6] 整合打包\n"
 	echo -e "[7] 设置包名    [8] BTB $SELF_OPERATION\n"
-	echo -e "[9] BTB 帮助    [0]     退出\n"
+	echo -e "[9] 更多功能    [0]     退出\n"
 	read -n1 -p "BMUID $BMUID 请输入序号：" OPTION
 	echo
 	####################################
@@ -110,7 +110,7 @@ function main() {
 			install
 		fi
 	elif [ "${OPTION}" == '9' ]; then
-		help
+		second
 	elif [ "${OPTION}" == '0' ]; then
 		exit
 	else
@@ -119,6 +119,33 @@ function main() {
 	fi
 	read -p "请按任意键继续..." -n 1 press
 	main
+}
+
+function second() {
+	#主函数
+	bmlogo
+	cd ~ >/dev/null
+	echo -e "$SELF_TITLE\n"
+	echo -e "[1] 更新日志    [2] BTB 帮助\n"
+#	echo -e "[3] 模组安装    [4] 模组卸载\n"
+#	echo -e "[5] 数据移除    [6] 整合打包\n"
+#	echo -e "[7] 设置包名    [8] BTB $SELF_OPERATION\n"
+	echo -e "    　　　　    [0] 返回主页\n"
+	read -n1 -p "BMUID $BMUID 请输入序号：" OPTION
+	echo
+	####################################
+	if [ "${OPTION}" == '1' ]; then
+		bmlog
+	elif [ "${OPTION}" == '2' ]; then
+		help
+	elif [ "${OPTION}" == '0' ]; then
+		main
+	else
+		#log "自身指令：$SELF_COMMAND 本地指令：[$LOCAL_COMMAND] 自身路径：$SELF_PATH 安装路径$LOCAL_PATH"
+		echo "输入错误！"
+	fi
+	read -p "请按任意键继续..." -n 1 press
+	second
 }
 
 #定义全局函数：
@@ -176,6 +203,18 @@ function bmsh_termux_init() {
 		pkg install git wget p7zip -y >/dev/null 2>&1
 		printf "\r  下载依赖包完成！\n"
 	fi
+}
+
+function bmlog() {
+read -p "你想查看几条记录？(默认0)：" line
+if [ ! $line ] ; then
+  wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log 
+elif [ $line -eq 0 ] ; then
+  wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log 
+else
+  wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log | tail -$line
+fi
+
 }
 
 function install() {
