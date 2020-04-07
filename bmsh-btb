@@ -28,7 +28,7 @@ SELF_DESC="未知"
 #脚本指令
 SELF_COMMAND="btb"
 #脚本版本
-SELF_VERSION="4.8"
+SELF_VERSION="4.9"
 #脚本安装状态
 SELF_INSTALLED="未知"
 #脚本可安装/卸载
@@ -84,7 +84,7 @@ function main() {
 	echo -e "[1] 数据导入    [2] 补丁安装\n"
 	echo -e "[3] 模组安装    [4] 模组卸载\n"
 	echo -e "[5] 数据移除    [6] 整合打包\n"
-	echo -e "[7] 设置包名    [8] BTB $SELF_OPERATION\n"
+	echo -e "[7] 设置包名    [8] 模组目录\n"
 	echo -e "[9] 更多功能    [0]     退出\n"
 	read -n1 -p "BMUID $BMUID 请输入序号：" OPTION
 	echo
@@ -104,11 +104,7 @@ function main() {
 	elif [ "${OPTION}" == '7' ]; then
 		set_pkg
 	elif [ "${OPTION}" == '8' ]; then
-		if [ "${SELF_INSTALLED}" == '已安装' ]; then
-			update
-		else
-			install
-		fi
+		bmmod
 	elif [ "${OPTION}" == '9' ]; then
 		second
 	elif [ "${OPTION}" == '0' ]; then
@@ -126,10 +122,10 @@ function second() {
 	bmlogo
 	cd ~ >/dev/null
 	echo -e "$SELF_TITLE\n"
-	echo -e "[1] 更新日志    [2] 模组目录\n"
+	echo -e "[1] 更新日志    [2] BTB 更新\n"
 	echo -e "[3] BTB 帮助    [0] 返回主页\n"
 #	echo -e "[5] 数据移除    [6] 整合打包\n"
-#	echo -e "[7] 设置包名    [8] BTB $SELF_OPERATION\n"
+#	echo -e "[7] 设置包名    [8] BTB 更新\n"
 #	echo -e "    　　　　    [0] 返回主页\n"
 	read -n1 -p "BMUID $BMUID 请输入序号：" OPTION
 	echo
@@ -137,7 +133,7 @@ function second() {
 	if [ "${OPTION}" == '1' ]; then
 		bmlog
 	elif [ "${OPTION}" == '2' ]; then
-		bmmod
+		update
 	elif [ "${OPTION}" == '3' ]; then
 		help
 	elif [ "${OPTION}" == '0' ]; then
