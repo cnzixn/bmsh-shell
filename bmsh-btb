@@ -28,7 +28,7 @@ SELF_DESC="未知"
 #脚本指令
 SELF_COMMAND="btb"
 #脚本版本
-SELF_VERSION="4.9"
+SELF_VERSION="5.0"
 #脚本安装状态
 SELF_INSTALLED="未知"
 #脚本可安装/卸载
@@ -210,7 +210,7 @@ if [ ! $line ] ; then
 elif [ $line -eq 0 ] ; then
   wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log 
 else
-  wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log | tail -$line
+  wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log | head -$line
 fi
 
 }
