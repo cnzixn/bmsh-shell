@@ -206,7 +206,7 @@ function bmsh_termux_init() {
 function bmlog() {
 read -p "你想查看几条记录？(默认0)：" line
 echo "----------------------------"
-echo "  时间      ID      更新内容"
+echo "  时间 ↑    ID       更新内容"
 if [ ! $line ] ; then
   wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log 
 elif [ $line -eq 0 ] ; then
