@@ -13,12 +13,11 @@ json=`wget -qO- "https://5.5w.pw/api?mid=$steam_id"`
 title=`echo $json | sed 's/.*"title":"\([^,}]*\)".*/\1/'`
 url=`echo $json | sed 's/.*"url":"\([^,}]*\)".*/\1/'`
 code=`echo $json | sed 's/.*"code":\([^,}]*\).*/\1/'`
-echo $code
 if [ $code -eq 200 ] ; then
 printf "开始下载……\n"
 printf "title：$title\n"
 printf "url：$url\n"
-wget -qO "/sdcard/download/[M]$title.ZIP" "$url"
+wget -qO "/sdcard/download/[WSD]$title.ZIP" "$url"
 printf "下载完成，已保存文件/sdcard/download/[WSD]$title.ZIP\n"
 else
 printf "下载失败！ID[$steam_id]有误！\n"
