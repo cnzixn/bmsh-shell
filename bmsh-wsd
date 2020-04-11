@@ -8,13 +8,13 @@ if [ ! $INPUT ] ; then
 echo "无法识别ID或URL，啥也没发生！"
 exit
 fi
-steam_id=`echo $INPUT | sed 's/http.*id=\([0-9]*\)&.*/\1/'`
+steam_id=`echo $INPUT | sed 's/http.*id=\([0-9]*\).*/\1/'`
 json=`wget -qO- "https://5.5w.pw/api?mid=$steam_id"`
 title=`echo $json | sed 's/.*"title":"\([^,}]*\)".*/\1/'`
 url=`echo $json | sed 's/.*"url":"\([^,}]*\)".*/\1/'`
 code=`echo $json | sed 's/.*"code":\([^,}]*\).*/\1/'`
 echo $code
-if [ $code==200 ] ; then
+if [ $code -eq 200 ] ; then
 printf "开始下载……\n"
 printf "title：$title\n"
 printf "url：$url\n"
