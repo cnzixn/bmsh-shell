@@ -7,12 +7,6 @@
 #远程执行
 #bash -c "$(wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-btb)"
 
-#GIT配置
-GID="LV9"
-git config --global user.name "$GID"
-git config --global user.email "zxchen1997@163.com"
-git config --global credential.helper store
-
 #定义全局变量：
 #执行本地脚本，则返回本地文件名
 #执行远程脚本，则返回bash
