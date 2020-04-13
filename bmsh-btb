@@ -9,8 +9,6 @@
 
 #GIT配置
 GID="LV9"
-git config --global user.name "$GID"
-git config --global user.email "zxchen1997@163.com"
 git config --global credential.helper store
 
 #定义全局变量：
@@ -208,17 +206,17 @@ read -p "你想查看几条记录？(默认0)：" line
 echo "----------------------------"
 echo "  时间 ↑    ID       更新内容"
 if [ ! $line ] ; then
-  wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log 
+  wget -qO- "https://gitee.com/$GID/bmsh-shell/raw/master/bmsh-log" 
 elif [ $line -eq 0 ] ; then
-  wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log 
+  wget -qO- "https://gitee.com/$GID/bmsh-shell/raw/master/bmsh-log" 
 else
-  wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-log | head -$line
+  wget -qO- "https://gitee.com/$GID/bmsh-shell/raw/master/bmsh-log" | head -$line
 fi
 echo "----------------------------"
 }
 
 function bmmod() {
-wget -qO- https://gitee.com/LV9/bmsh-shell/raw/master/bmsh-mod 
+wget -qO- "https://gitee.com/$GID/bmsh-shell/raw/master/bmsh-mod" 
 }
 
 function install() {
@@ -650,7 +648,7 @@ function package() {
 		mkdir -p $(dirname "$key")
 	fi
 	
-	wget -qO "$key" https://lv9.gitee.io/bmsh-btb.key
+	wget -qO "$key" "https://lv9.gitee.io/bmsh-btb.key"
 	if [ -f "$key" ]; then
 		printf "下载签名密钥成功！\n"
 	else
@@ -658,7 +656,7 @@ function package() {
 		return 2
 	fi
 
-	wget -qO /sdcard/摇摇船.APK https://lv9.gitee.io/bm_1.27.apk
+	wget -qO /sdcard/摇摇船.APK "https://lv9.gitee.io/bm_1.27.apk"
 	if [ -f "/sdcard/摇摇船.APK" ]; then
 		printf "下载摇摇船成功！\n"
 	else
@@ -761,7 +759,7 @@ elif [ $1 == -h ]; then
 	help
 elif [ $1 == -d ]; then
 	#STEAM下载模组
-	bash -c "$(wget -qO- https://gitee.com/lv9/bmsh-shell/raw/master/bmsh-wsd)"
+	bash -c "$(wget -qO- https://gitee.com/$GID/bmsh-shell/raw/master/bmsh-wsd)"
 else
 	help
 fi
