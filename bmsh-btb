@@ -191,14 +191,14 @@ function bmsh_termux_init() {
 			termux_need_setup_storage="true"
 		fi
 	done
-	which git wget 7za >/dev/null 2>&1
+	which git wget 7z >/dev/null 2>&1
 	if [ "$?" == 1 ]; then
 		sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux stable main@' $PREFIX/etc/apt/sources.list
 		apt update && apt upgrade -y
 		printf "\r  下载依赖包......"
 		pkg install git wget p7zip -y >/dev/null 2>&1
 	fi
-	which git wget 7za >/dev/null 2>&1
+	which git wget 7z >/dev/null 2>&1
 	if [ "$?" == 0 ]; then
 		printf "\r  下载依赖包完成！\n"
 	else
@@ -389,7 +389,7 @@ APK_OOBB=$temp
 
 function mod_list() {
 	if [ -f "$APK_BOBB" ]; then
-		str=$(7za l "$APK_BOBB" "mods/BM????/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
+		str=$(7z l "$APK_BOBB" "mods/BM????/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
 		str=${str:-"无模组"}
 		chars=$(echo $str | wc -c)
 		lines=$(expr $chars / 35)
@@ -488,7 +488,7 @@ function patch_install() {
 			fi
 		done
 		printf "复制$list......\r"
-		7za a -tzip "$APK_BOBB" $list >/dev/null 2>&1
+		7z a -tzip "$APK_BOBB" $list >/dev/null 2>&1
 		if [ "$?" -eq 0 ]; then
 			printf "复制$list成功！\n"
 		else
@@ -526,11 +526,11 @@ function mod_install() {
 		#  #  #  #  #  #  #  #  #  #
 		#删除旧文件
 		if [ -f "$APK_BOBB" ]; then
-			old=$(7za l "$APK_BOBB" "mods/$BNAME/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
+			old=$(7z l "$APK_BOBB" "mods/$BNAME/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
 		fi
 		if [ $old ]; then
 			printf "删除$BNAME......\r"
-			7za d -tzip -r "$APK_BOBB" "mods/$BNAME/" >/dev/null 2>&1
+			7z d -tzip -r "$APK_BOBB" "mods/$BNAME/" >/dev/null 2>&1
 			if [ "$?" -eq 0 ]; then
 				printf "删除$BNAME成功！\r"
 			else
@@ -549,7 +549,7 @@ function mod_install() {
 			rm -rf $GNAME/.git
 			mv $GNAME mods
 			printf "安装$BNAME......\r"
-			7za a -tzip "$APK_BOBB" mods >/dev/null 2>&1
+			7z a -tzip "$APK_BOBB" mods >/dev/null 2>&1
 			if [ "$?" -eq 0 ]; then
 				printf "安装$BNAME成功！\n"
 			else
@@ -587,11 +587,11 @@ function mod_uninstall() {
 		#  #  #  #  #  #  #  #  #  #
 		#删除模组
 		if [ -f "$APK_BOBB" ]; then
-			old=$(7za l "$APK_BOBB" "mods/$BNAME/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
+			old=$(7z l "$APK_BOBB" "mods/$BNAME/" | grep -Eo "BM[0-9]+" | tr ' ' '\n' | uniq | sort -n)
 		fi
 		if [ $old ]; then
 			printf "删除$BNAME......\r"
-			7za d -tzip -r "$APK_BOBB" "mods/$BNAME/" >/dev/null 2>&1
+			7z d -tzip -r "$APK_BOBB" "mods/$BNAME/" >/dev/null 2>&1
 			if [ "$?" -eq 0 ]; then
 				printf "删除$BNAME成功！\n"
 			else
