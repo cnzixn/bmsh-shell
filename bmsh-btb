@@ -720,9 +720,9 @@ read -p "请输入文件ID：" LIST
 		fi
 		if [ -d "$GNAME" ]; then
 			rm -rf $GNAME/.git
-			mv $GNAME mods
+			cd $GNAME
 			printf "打包$BNAME......\r"
-			7z a -tzip "/sdcard/$BNAME" mods/$BNAME >/dev/null 2>&1
+			7z a -tzip "/sdcard/$BNAME" "$BNAME" >/dev/null 2>&1
 			if [ "$?" -eq 0 ]; then
 				printf "打包$BNAME成功！\n"
 			else
