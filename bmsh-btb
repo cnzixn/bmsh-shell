@@ -734,6 +734,7 @@ read -p "请输入文件ID：" LIST
 			printf "打包$BNAME失败！\n"
 		fi
 	done
+	echo "文件保存在“/sdcard”目录"
 }
 
 #脚本开始
