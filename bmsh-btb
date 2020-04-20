@@ -199,13 +199,13 @@ function bmsh_termux_init() {
 		apt update && apt upgrade -y
 		printf "\r  下载依赖包......"
 		apt install git wget p7zip -y >/dev/null 2>&1
-	fi
-	which git wget 7z >/dev/null 2>&1
+		which git wget 7z >/dev/null 2>&1
 	if [ "$?" == 0 ]; then
 		printf "\r  下载依赖包完成！\n"
 	else
 	  printf "\r  下载依赖包失败！\n"
 	  exit
+	fi
 	fi
 }
 
